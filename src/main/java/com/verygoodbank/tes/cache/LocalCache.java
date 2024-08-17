@@ -6,8 +6,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public interface LocalCache {
 
-    static Optional getProductName(String productId) {
-        return Optional.ofNullable(cache().get(productId));
+    static Optional<String> productNameCache(String productId) {
+        return Optional.of(cache().get(productId));
     }
 
     private static Map<Integer, String> cache() {
