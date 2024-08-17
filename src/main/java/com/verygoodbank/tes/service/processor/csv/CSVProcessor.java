@@ -1,11 +1,14 @@
 package com.verygoodbank.tes.service.processor.csv;
 
+import com.opencsv.CSVWriter;
 import com.verygoodbank.tes.service.processor.Processor;
 import com.verygoodbank.tes.service.processor.product.ProductProcessor;
 import com.verygoodbank.tes.web.model.ProductData;
 import com.verygoodbank.tes.web.model.TradeData;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -67,7 +70,33 @@ public class CSVProcessor implements Processor<File, byte[]> {
 
     //todo add file writing
     private File writeProductsData(List<ProductData> products) {
-        return null;
+        // Create a temporary file
+        File csvFile = null;
+        try {
+            csvFile = File.createTempFile("products1", ".csv");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try (CSVWriter writer = new CSVWriter(new FileWriter(csvFile))) {
+            // Write header
+            String[] header = {"product_id", "product_name"};
+            writer.writeNext(header);
+
+            // Write data
+            for (ProductData product : products) {
+                String[] data = {
+                        product.productId(),
+                        product.productName()
+                };
+                writer.writeNext(data);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Return the generated CSV file
+        return csvFile;
     }
 
     private TradeData mapToTradeRequest(String line) {

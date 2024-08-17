@@ -1,6 +1,4 @@
 package com.verygoodbank.tes.web.model;
 
-import java.math.BigDecimal;
-
-public record ProductData(String date, String productName, String currency, BigDecimal price) {
+public record ProductData(String productId, String productName) {
 }
