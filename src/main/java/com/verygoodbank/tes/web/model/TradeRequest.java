@@ -1,7 +1,7 @@
 package com.verygoodbank.tes.web.model;
 
-import java.math.BigInteger;
+import java.math.BigDecimal;
 
-public record TradeRequest(String productId, BigInteger price, String date, String currency) {
+public record TradeRequest(String productId, BigDecimal price, String date, String currency) {
 
 }
