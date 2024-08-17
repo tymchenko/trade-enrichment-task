@@ -6,10 +6,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public interface LocalCache {
 
-    static String getProductName(String productId) {
-        return Optional.ofNullable(cache().get(productId))
-                .orElseThrow(() ->
-                        new RuntimeException(String.format("No product with productId: %s found", productId)));
+    static Optional getProductName(String productId) {
+        return Optional.ofNullable(cache().get(productId));
     }
 
     private static Map<Integer, String> cache() {
