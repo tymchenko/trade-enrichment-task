@@ -16,29 +16,31 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
+//todo refactor this class
 //curl --data @src/test/resources/trade.csv --header 'Content-Type: text/csv' http://localhost:8080/api/v1/enrich
 //curl --data @trade.csv --header 'Content-Type: text/csv' http://localhost:8080/api/v1/enrich
 @RestController
 @RequestMapping("api/v1")
 public class TradeEnrichmentController {
+
     @PostMapping(value = "/enrich",
             consumes = "text/csv",
             produces = "text/csv")
-    public ResponseEntity uploadCsvFile(@RequestBody byte[] fileData) {
-        if (fileData.length == 0) {
+    public ResponseEntity uploadCsvFile(@RequestBody byte[] trades) {
+        if (trades.length == 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File is empty");
         }
 
         try {
             // Convert byte array to String
-            String csvContent = new String(fileData, StandardCharsets.UTF_8);
+            String csvContent = new String(trades, StandardCharsets.UTF_8);
             System.out.println("Raw CSV Content:");
             System.out.println(csvContent);
 
 
             // Print raw bytes to diagnose hidden characters or issues
             System.out.println("Raw bytes:");
-            for (byte b : fileData) {
+            for (byte b : trades) {
                 System.out.printf("%02X ", b);
             }
             System.out.println();
