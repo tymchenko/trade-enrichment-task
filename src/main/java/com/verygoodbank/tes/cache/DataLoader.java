@@ -29,8 +29,9 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void loadCsvDataIntoRedis() {
+        String productNames = "product.csv";
         try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("product.csv"))))) {
+                new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream(productNames))))) {
 
             String line;
             reader.readLine();

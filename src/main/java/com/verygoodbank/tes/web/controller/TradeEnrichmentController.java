@@ -12,7 +12,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
-import static com.verygoodbank.tes.service.validation.DateValidator.notValidDate;
+import static com.verygoodbank.tes.web.controller.validation.DateValidator.notValidDate;
 
 //curl --data @src/test/resources/trade.csv --header 'Content-Type: text/csv' http://localhost:8080/api/v1/enrich
 //curl --data @trade.csv --header 'Content-Type: text/csv' http://localhost:8080/api/v1/enrich

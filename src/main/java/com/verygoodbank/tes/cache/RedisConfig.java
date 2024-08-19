@@ -1,6 +1,5 @@
-package com.verygoodbank.tes;
+package com.verygoodbank.tes.cache;
 
-import com.verygoodbank.tes.cache.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
