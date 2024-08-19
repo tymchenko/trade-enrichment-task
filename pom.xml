@@ -22,8 +22,6 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- You may use 3rd party libraries -->
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -49,6 +47,10 @@
 			<groupId>com.github.codemonstur</groupId>
 			<artifactId>embedded-redis</artifactId>
 			<version>1.4.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
 		</dependency>
 	</dependencies>
 

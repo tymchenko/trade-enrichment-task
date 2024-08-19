@@ -14,8 +14,15 @@ import java.util.Iterator;
 
 import static com.verygoodbank.tes.web.controller.validation.DateValidator.notValidDate;
 
-//curl --data @src/test/resources/trade.csv --header 'Content-Type: text/csv' http://localhost:8080/api/v1/enrich
-//curl --data @trade.csv --header 'Content-Type: text/csv' http://localhost:8080/api/v1/enrich
+/**
+ * TradeEnrichmentController - http controller which receives InputStream and returns StreamingResponseBody.
+ * I made it with a reason of increase capacity of trades computing from request
+ * Also I tried to use as less memory as possible.
+ *
+ * I've updated curl command because I needed to use InputStream as a parameter of controller.
+ * I left trade.csv in resources directory for testing purposes.
+ * curl --data-binary @resources/trade.csv --header 'Content-Type: text/csv' http://localhost:8080/api/v1/enrich
+ */
 @RestController
 @RequestMapping("api/v1")
 public class TradeEnrichmentController {
@@ -24,6 +31,7 @@ public class TradeEnrichmentController {
     private static final int PRODUCT_ID_INDEX = 1;
     private static final int CURRENCY_INDEX = 2;
     private static final int PRICE_INDEX = 3;
+    private static final String[] RESPONSE_FILE_HEADER = {"date", "product_name", "currency", "price"};
 
     private final ProductNameCache productNameCache;
 
@@ -32,19 +40,22 @@ public class TradeEnrichmentController {
         this.productNameCache = productNameCache;
     }
 
-    @PostMapping(value = "/enrich", consumes = "text/csv", produces = "text/csv")
+    @PostMapping(value = "/enrich", consumes = "text/csv")
     public StreamingResponseBody uploadCsvFile(InputStream inputStream) {
 
         return outputStream -> {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
                  CSVReader csvReader = new CSVReader(reader);
                  BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-                 CSVWriter csvWriter = new CSVWriter(writer)) {
+                 CSVWriter csvWriter = new CSVWriter(writer,
+                         CSVWriter.DEFAULT_SEPARATOR,
+                         CSVWriter.NO_QUOTE_CHARACTER,
+                         CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+                         CSVWriter.DEFAULT_LINE_END)) {
 
                 csvReader.skip(1);
 
-                String[] header = {"date" , "product_name", "currency", "price"};
-                csvWriter.writeNext(header);
+                csvWriter.writeNext(RESPONSE_FILE_HEADER);
 
                 Iterator<String[]> iterator = csvReader.iterator();
                 while (iterator.hasNext()) {
@@ -55,14 +66,14 @@ public class TradeEnrichmentController {
 
                     String productName = productNameCache.getProductDataById(values[PRODUCT_ID_INDEX]);
                     if(productName == null) {
-                        continue;
+                        productName = "Missing Product Name";
                     }
 
-                    String[] line = {values[0], productName, values[CURRENCY_INDEX], values[PRICE_INDEX]};
+                    String[] line = {values[DATE_INDEX], productName, values[CURRENCY_INDEX], values[PRICE_INDEX]};
+
                     csvWriter.writeNext(line);
                 }
             }
-            outputStream.flush();
         };
     }
 }
