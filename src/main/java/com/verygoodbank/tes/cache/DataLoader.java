@@ -1,46 +1,39 @@
 package com.verygoodbank.tes.cache;
 
-import org.springframework.boot.CommandLineRunner;
+import com.opencsv.CSVReader;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import redis.embedded.RedisServer;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Iterator;
 import java.util.Objects;
 
 @Component
-public class DataLoader implements CommandLineRunner {
+public class DataLoader {
     private static final int PRODUCT_ID_INDEX = 0;
     private static final int PRODUCT_NAME_INDEX = 1;
+    private final String productNames;
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    public DataLoader(RedisTemplate<String, String> redisTemplate, RedisProperties redisProperties) throws IOException {
+    public DataLoader(RedisTemplate<String, String> redisTemplate, @Value("${product.names}")String productNames) {
         this.redisTemplate = redisTemplate;
-        RedisServer redisServer = new RedisServer(redisProperties.getRedisPort());
-        redisServer.start();
+        this.productNames = productNames;
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-        loadCsvDataIntoRedis();
-    }
-
-    private void loadCsvDataIntoRedis() {
-        String productNames = "product.csv";
+    @PostConstruct
+    void loadCsvDataIntoRedis() {
         try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream(productNames))))) {
+                new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream(productNames))));
+             CSVReader csvReader = new CSVReader(reader)) {
 
-            String line;
-            reader.readLine();
-
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 2) {
-                    redisTemplate.opsForValue().set(parts[PRODUCT_ID_INDEX], parts[PRODUCT_NAME_INDEX]);
-                }
+            Iterator<String[]> iterator = csvReader.iterator();
+            while (iterator.hasNext()) {
+                String[] values = iterator.next();
+                redisTemplate.opsForValue().set(values[PRODUCT_ID_INDEX], values[PRODUCT_NAME_INDEX]);
             }
         } catch (Exception e) {
             e.printStackTrace();
